@@ -35,6 +35,7 @@ type stateClient struct {
 	Name        string
 	AccessToken string
 	RunId       string
+	Insecure    bool
 	HTTPClient  *retryablehttp.Client
 
 	conflictHandlingAttempted bool
@@ -221,7 +222,11 @@ func (c *stateClient) http() (*retryablehttp.Client, error) {
 	if c.HTTPClient != nil {
 		return c.HTTPClient, nil
 	}
+
+	log.Printf("[DEBUG] User ask insecure to %v\n", c.Insecure)
 	tlsConfig := &tls.Config{}
+	tlsConfig.InsecureSkipVerify = c.Insecure
+
 	err := rootcerts.ConfigureTLS(tlsConfig, &rootcerts.Config{
 		CAFile: os.Getenv("ATLAS_CAFILE"),
 		CAPath: os.Getenv("ATLAS_CAPATH"),

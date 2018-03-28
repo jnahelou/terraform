@@ -113,6 +113,12 @@ func (b *Backend) init() {
 				Description: schemaDescriptions["address"],
 				DefaultFunc: schema.EnvDefaultFunc("ATLAS_ADDRESS", defaultAtlasServer),
 			},
+			"insecure": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: schemaDescriptions["insecure"],
+			},
 		},
 
 		ConfigureFunc: b.schemaConfigure,
@@ -145,6 +151,7 @@ func (b *Backend) schemaConfigure(ctx context.Context) error {
 		AccessToken: d.Get("access_token").(string),
 		User:        org,
 		Name:        env,
+		Insecure:    d.Get("insecure").(bool),
 
 		// This is optionally set during Atlas Terraform runs.
 		RunId: os.Getenv("ATLAS_RUN_ID"),
@@ -160,4 +167,6 @@ var schemaDescriptions = map[string]string{
 	"address": "Address to your Atlas installation. This defaults to the publicly\n" +
 		"hosted version at 'https://atlas.hashicorp.com/'. This address\n" +
 		"should contain the full HTTP scheme to use.",
+	"insecure": "Explicitly allow the backend to perform \"insecure\" SSL requests. If omitted," +
+		"default value is `false`",
 }
